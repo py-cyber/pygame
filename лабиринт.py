@@ -20,7 +20,7 @@ class Labirint:
         self.finish_tile = finish_tile
 
     def render(self, screen):
-        colors = {0: 'black', 1: (100, 100, 100), 2: (50, 50, 50)}
+        colors = {0: 'white', 1: (100, 100, 100), 2: (50, 50, 50)}
         for y in range(self.height):
             for x in range(self.width):
                 rect = pygame.Rect(x * self.tile_size, y * self.tile_size, self.tile_size, self.tile_size)
@@ -90,8 +90,9 @@ class Game:
         return self.hero.get_position() == self.enemy.get_position()
 
 class Hero:
-    def __init__(self, position):
+    def __init__(self, pic, position):
         self.x, self.y = position
+        self.image = pygame.image.load(f"images/{pic}")
 
     def get_position(self):
         return self.x, self.y
@@ -100,14 +101,15 @@ class Hero:
         self.x, self.y = position
 
     def render(self, screen):
-        center = self.x * TILE_SIZE + TILE_SIZE // 2, self.y * TILE_SIZE + TILE_SIZE // 2
-        pygame.draw.circle(screen, (255, 255, 255), center, TILE_SIZE // 2)
+        delta = (self.image.get_width() - TILE_SIZE) // 2
+        screen.blit(self.image, (self.x * TILE_SIZE - delta, self.y * TILE_SIZE - delta))
 
 class Enemy:
-    def __init__(self, position):
+    def __init__(self, pic, position):
         self.x, self.y = position
         self.delay = 100
         pygame.time.set_timer(ENEMY_EVENT_TYPE, self.delay)
+        self.image = pygame.image.load(f"images/{pic}")
 
     def get_position(self):
         return self.x, self.y
@@ -116,8 +118,8 @@ class Enemy:
         self.x, self.y = position
 
     def render(self, screen):
-        center = self.x * TILE_SIZE + TILE_SIZE // 2, self.y * TILE_SIZE + TILE_SIZE // 2
-        pygame.draw.circle(screen, 'yellow', center, TILE_SIZE // 2)
+        delta = (self.image.get_width() - TILE_SIZE) // 2
+        screen.blit(self.image, (self.x * TILE_SIZE - delta, self.y * TILE_SIZE - delta))
 
 def show_message(screen, message):
     font = pygame.font.Font(None, 50)
@@ -134,8 +136,8 @@ def main():
     screen = pygame.display.set_mode(SIZE)
 
     labirint = Labirint('simple_map', [0, 2], 2)
-    hero = Hero((7, 8))
-    enemy = Enemy((7, 1))
+    hero = Hero("hero.png", (7, 8))
+    enemy = Enemy("enemy.png", (7, 1))
     game = Game(labirint, hero, enemy)
 
     clock = pygame.time.Clock()
